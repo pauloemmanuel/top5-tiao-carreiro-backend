@@ -33,3 +33,12 @@ docker compose exec app php artisan migrate
 ---
 Qualquer dúvida, consulte o Dockerfile e o docker-compose.yml para detalhes de configuração.
 
+**Passo final obrigatório:**
+Após subir os containers pela primeira vez, gere a chave de aplicação Laravel rodando:
+
+```
+docker compose exec app php artisan key:generate
+```
+
+Isso é necessário para evitar erros de criptografia e autenticação.
+

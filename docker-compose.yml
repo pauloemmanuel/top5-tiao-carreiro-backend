@@ -1,21 +1,36 @@
 version: '3.8'
 
 services:
+
   app:
     build:
-      context: ./api
+      context: .
     image: laravel-api-app
     container_name: laravel-api-app
     restart: unless-stopped
     working_dir: /var/www
     volumes:
       - ./api:/var/www
-    ports:
-      - "9000:9000"
+    expose:
+      - "9000"
     networks:
       - laravel
     depends_on:
       - db
+
+  nginx:
+    image: nginx:1.25
+    container_name: laravel-api-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx-app.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./api:/var/www:ro
+    depends_on:
+      - app
+    networks:
+      - laravel
 
   db:
     image: mysql:8.0

@@ -1,16 +1,16 @@
-# Dockerfile para Laravel API
+# Dockerfile para Laravel API (PHP-FPM)
 FROM php:8.1-fpm
 
 # Instala dependências do sistema
 RUN apt-get update && apt-get install -y \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    zip \
-    unzip \
-    curl \
-    git \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+  libpng-dev \
+  libonig-dev \
+  libxml2-dev \
+  zip \
+  unzip \
+  curl \
+  git \
+  && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
 # Instala Composer
 COPY --from=composer:2.8 /usr/bin/composer /usr/bin/composer
@@ -25,4 +25,4 @@ RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
 EXPOSE 9000
-CMD ["php-fpm"]
+ENTRYPOINT ["/bin/sh", "-c", "chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache && exec php-fpm"]
