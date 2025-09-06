@@ -28,9 +28,9 @@ class SugestaoController extends Controller
     {
         $perPage = $request->get('per_page', 15);
         $status = $request->get('status');
-        
+
         $query = Sugestao::with('aprovadoPor')->orderBy('created_at', 'desc');
-        
+
         if ($status) {
             $query->where('status', $status);
         }
@@ -119,7 +119,7 @@ class SugestaoController extends Controller
             ], 422);
         } catch (\Exception $e) {
             Log::error('Erro ao criar sugestão: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Erro interno do servidor'
@@ -133,7 +133,7 @@ class SugestaoController extends Controller
     public function show(Sugestao $sugestao): JsonResponse
     {
         $sugestao->load('aprovadoPor');
-        
+
         return response()->json([
             'success' => true,
             'data' => $sugestao
@@ -194,7 +194,7 @@ class SugestaoController extends Controller
             ], 422);
         } catch (\Exception $e) {
             Log::error('Erro ao aprovar sugestão: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Erro interno do servidor'
@@ -236,7 +236,7 @@ class SugestaoController extends Controller
             ], 422);
         } catch (\Exception $e) {
             Log::error('Erro ao rejeitar sugestão: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Erro interno do servidor'
@@ -259,7 +259,7 @@ class SugestaoController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Erro ao remover sugestão: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Erro interno do servidor'

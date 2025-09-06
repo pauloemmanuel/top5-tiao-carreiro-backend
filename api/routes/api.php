@@ -25,11 +25,10 @@ Route::get('/ping', function () {
     ]);
 });
 
-// Rotas de autenticação
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
-    
+
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/user', [AuthController::class, 'user']);
         Route::post('/logout', [AuthController::class, 'logout']);
@@ -37,15 +36,11 @@ Route::prefix('auth')->group(function () {
     });
 });
 
-// Rotas de músicas
 Route::prefix('musicas')->group(function () {
-    // Rotas públicas
     Route::get('/', [MusicaController::class, 'index']);
     Route::get('/top5', [MusicaController::class, 'top5']);
     Route::get('/demais', [MusicaController::class, 'demais']);
     Route::get('/{musica}', [MusicaController::class, 'show']);
-    
-    // Rotas protegidas (requer autenticação)
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/', [MusicaController::class, 'store']);
         Route::put('/{musica}', [MusicaController::class, 'update']);
@@ -53,12 +48,9 @@ Route::prefix('musicas')->group(function () {
     });
 });
 
-// Rotas de sugestões
 Route::prefix('sugestoes')->group(function () {
-    // Rota pública para enviar sugestões
     Route::post('/', [SugestaoController::class, 'store']);
-    
-    // Rotas protegidas (requer autenticação)
+
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/', [SugestaoController::class, 'index']);
         Route::get('/{sugestao}', [SugestaoController::class, 'show']);

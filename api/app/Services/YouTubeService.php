@@ -27,7 +27,7 @@ class YouTubeService
     {
         try {
             $url = "https://www.youtube.com/watch?v=" . $videoId;
-            
+
             $response = $this->client->get($url);
             $html = $response->getBody()->getContents();
 

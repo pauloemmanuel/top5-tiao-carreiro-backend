@@ -37,16 +37,18 @@ services:
     container_name: laravel-api-db
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: laravel
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: top5_tiao_carreiro
+      MYSQL_ROOT_PASSWORD: root123
       MYSQL_USER: laravel
-      MYSQL_PASSWORD: laravel
+      MYSQL_PASSWORD: laravel123
     ports:
       - "3306:3306"
     volumes:
       - dbdata:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     networks:
       - laravel
+    command: --default-authentication-plugin=mysql_native_password
 
 networks:
   laravel:

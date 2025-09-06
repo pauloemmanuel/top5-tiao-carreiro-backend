@@ -66,7 +66,7 @@ class Musica extends Model
     public function getVisualizacoesFormatadaAttribute(): string
     {
         $numero = $this->visualizacoes;
-        
+
         if ($numero >= 1000000000) {
             return number_format($numero / 1000000000, 1) . 'B';
         }
@@ -76,7 +76,7 @@ class Musica extends Model
         if ($numero >= 1000) {
             return number_format($numero / 1000, 1) . 'K';
         }
-        
+
         return (string) $numero;
     }
 

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('thumb');
             $table->enum('status', ['ativa', 'inativa'])->default('ativa');
             $table->timestamps();
-            
+
             $table->index(['status', 'visualizacoes']);
         });
     }

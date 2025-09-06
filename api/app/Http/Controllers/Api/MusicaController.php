@@ -26,7 +26,7 @@ class MusicaController extends Controller
     public function index(Request $request): JsonResponse
     {
         $perPage = $request->get('per_page', 15);
-        
+
         $musicas = Musica::ativas()
             ->ordenadaPorVisualizacoes()
             ->paginate($perPage);
@@ -62,7 +62,7 @@ class MusicaController extends Controller
     public function demais(Request $request): JsonResponse
     {
         $perPage = $request->get('per_page', 10);
-        
+
         $musicas = Musica::demais()->paginate($perPage);
 
         return response()->json([
@@ -122,7 +122,7 @@ class MusicaController extends Controller
             ], 422);
         } catch (\Exception $e) {
             Log::error('Erro ao adicionar música: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage()
@@ -197,7 +197,7 @@ class MusicaController extends Controller
             ], 422);
         } catch (\Exception $e) {
             Log::error('Erro ao atualizar música: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Erro interno do servidor'
@@ -220,7 +220,7 @@ class MusicaController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Erro ao remover música: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Erro interno do servidor'

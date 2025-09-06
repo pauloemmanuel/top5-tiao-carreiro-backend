@@ -24,7 +24,7 @@ return new class extends Migration
             $table->foreignId('aprovado_por')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamp('aprovado_em')->nullable();
             $table->timestamps();
-            
+
             $table->index(['status', 'created_at']);
         });
     }

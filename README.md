@@ -1,44 +1,112 @@
-# top5-tiao-carreiro-backend
+# Top 5 Tião Carreiro & Pardinho - Backend API
 
+Este é o backend da aplicação Top 5 Tião Carreiro & Pardinho, desenvolvido em Laravel 11 com MySQL e Docker. A aplicação permite listar as músicas mais tocadas da dupla, receber sugestões de novas músicas e gerenciar aprovações através de uma API REST.
 
-## Como iniciar o projeto Laravel (API) com Docker
+## 🎯 Funcionalidades
 
-1. Certifique-se de que o Docker Desktop está rodando.
-2. Clone o repositório e acesse a pasta do projeto.
-3. Execute o comando abaixo na raiz do projeto:
+- **API REST** completa para gerenciamento de músicas
+- **Sistema de sugestões** com aprovação/rejeição
+- **Autenticação JWT** com Laravel Sanctum
+- **Integração com YouTube** para buscar informações dos vídeos
+- **Paginação** para listas grandes
+- **Testes automatizados** com PHPUnit
+- **Docker** para padronização do ambiente
 
-```
-docker compose up -d --build
-```
+## 🛠️ Tecnologias
 
-4. O serviço Laravel estará disponível na porta 9000 do container (php-fpm). Para acessar via navegador, utilize um servidor web (Nginx/Apache) ou configure o Laravel Sail/Valet se desejar acesso HTTP.
+- **Laravel 11** (PHP 8.2)
+- **MySQL 8.0**
+- **Laravel Sanctum** (Autenticação)
+- **Guzzle HTTP** (Requisições HTTP)
+- **Docker & Docker Compose**
+- **PHPUnit** (Testes)
 
-5. O banco de dados MySQL estará disponível na porta 3306 do container `laravel-api-db`.
+## 🚀 Como executar o projeto
 
+### Pré-requisitos
 
-6. Para instalar dependências:
+- Docker Desktop instalado e rodando
+- Git
 
-```
-docker compose exec app composer install
-```
+### Setup do projeto
 
-7. Para rodar migrations:
-
-```
-docker compose exec app php artisan migrate
-```
-
-
-
----
-Qualquer dúvida, consulte o Dockerfile e o docker-compose.yml para detalhes de configuração.
-
-**Passo final obrigatório:**
-Após subir os containers pela primeira vez, gere a chave de aplicação Laravel rodando:
-
-```
-docker compose exec app php artisan key:generate
+1. Clone o repositório:
+```bash
+git clone https://github.com/pauloemmanuel/top5-tiao-carreiro-backend.git
+cd top5-tiao-carreiro-backend
 ```
 
-Isso é necessário para evitar erros de criptografia e autenticação.
+2. Inicie os containers:
+```bash
+docker-compose up -d --build
+```
+
+3. Gere a chave da aplicação Laravel:
+```bash
+docker-compose exec app php artisan key:generate
+```
+
+4. Aguarde o MySQL inicializar (aproximadamente 30 segundos) e execute as migrations:
+```bash
+docker-compose exec app php artisan migrate:fresh --seed
+```
+
+
+5. Teste a api em:
+   - **API**: http://localhost/api/ping
+
+
+## 🧪 Testes
+
+Execute os testes automatizados:
+
+```bash
+docker-compose exec app php artisan test
+```
+
+### Testando a API com Postman/Insomnia
+
+Importe o arquivo `postman_collection.json` no Postman ou Insomnia para testar todos os endpoints da API.
+
+**Variáveis da coleção:**
+- `base_url`: http://localhost/api
+- `auth_token`: Token JWT retornado no login
+
+**Fluxo recomendado:**
+1. Fazer login para obter o token
+2. Configurar a variável `auth_token` 
+3. Testar endpoints protegidos
+
+## 📊 Banco de Dados
+
+### Usuários padrão criados pelos seeders:
+
+- **Admin**: admin@tiaocarreiro.com / password123
+- **Teste**: teste@tiaocarreiro.com / teste123
+
+### Estrutura das tabelas:
+
+- `users` - Usuários do sistema
+- `musicas` - Músicas cadastradas
+- `sugestoes` - Sugestões enviadas pelos usuários
+
+## 🔧 Comandos úteis
+
+```bash
+# Acessar container da aplicação
+docker-compose exec app bash
+
+# Ver logs
+docker-compose logs -f app
+
+# Parar containers
+docker-compose down
+
+# Recriar banco de dados
+docker-compose exec app php artisan migrate:fresh --seed
+
+# Limpar cache
+docker-compose exec app php artisan cache:clear
+docker-compose exec app php artisan config:clear
+```
 
