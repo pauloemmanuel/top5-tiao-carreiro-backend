@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Sugestao;
 use App\Models\Musica;
 use App\Services\YouTubeService;
+use App\Http\Requests\Sugestao\StoreSugestaoRequest;
+use App\Http\Requests\Sugestao\ProcessarSugestaoRequest;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
@@ -52,12 +54,10 @@ class SugestaoController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreSugestaoRequest $request): JsonResponse
     {
         try {
-            $request->validate([
-                'url_youtube' => 'required|url',
-            ]);
+            $validated = $request->validated();
 
             $videoId = $this->youtubeService::extrairVideoId($request->url_youtube);
             if (!$videoId) {
@@ -143,7 +143,7 @@ class SugestaoController extends Controller
     /**
      * Aprovar sugestão
      */
-    public function aprovar(Request $request, Sugestao $sugestao): JsonResponse
+    public function aprovar(ProcessarSugestaoRequest $request, Sugestao $sugestao): JsonResponse
     {
         try {
             if ($sugestao->status !== 'pendente') {
@@ -153,9 +153,7 @@ class SugestaoController extends Controller
                 ], 409);
             }
 
-            $request->validate([
-                'observacoes' => 'nullable|string|max:500'
-            ]);
+            $validated = $request->validated();
 
             // Se não tiver informações do vídeo, busca agora
             if (!$sugestao->titulo) {
@@ -205,7 +203,7 @@ class SugestaoController extends Controller
     /**
      * Rejeitar sugestão
      */
-    public function rejeitar(Request $request, Sugestao $sugestao): JsonResponse
+    public function rejeitar(ProcessarSugestaoRequest $request, Sugestao $sugestao): JsonResponse
     {
         try {
             if ($sugestao->status !== 'pendente') {
@@ -215,9 +213,7 @@ class SugestaoController extends Controller
                 ], 409);
             }
 
-            $request->validate([
-                'observacoes' => 'nullable|string|max:500'
-            ]);
+            $validated = $request->validated();
 
             // Rejeita a sugestão
             $sugestao->rejeitar($request->user(), $request->observacoes);

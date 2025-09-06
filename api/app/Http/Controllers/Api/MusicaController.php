@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Musica;
 use App\Services\YouTubeService;
+use App\Http\Requests\Musica\StoreMusicaRequest;
+use App\Http\Requests\Musica\UpdateMusicaRequest;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
@@ -80,12 +82,10 @@ class MusicaController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreMusicaRequest $request): JsonResponse
     {
         try {
-            $request->validate([
-                'url_youtube' => 'required|url',
-            ]);
+            $validated = $request->validated();
 
             $videoId = $this->youtubeService::extrairVideoId($request->url_youtube);
             if (!$videoId) {
@@ -144,15 +144,10 @@ class MusicaController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Musica $musica): JsonResponse
+    public function update(UpdateMusicaRequest $request, Musica $musica): JsonResponse
     {
         try {
-            $request->validate([
-                'titulo' => 'sometimes|string|max:255',
-                'visualizacoes' => 'sometimes|integer|min:0',
-                'status' => 'sometimes|in:ativa,inativa',
-                'url_youtube' => 'sometimes|url',
-            ]);
+            $validated = $request->validated();
 
             $data = $request->only(['titulo', 'visualizacoes', 'status']);
 
