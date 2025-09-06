@@ -15,17 +15,20 @@ docker compose up -d --build
 
 5. O banco de dados MySQL estará disponível na porta 3306 do container `laravel-api-db`.
 
-6. Para rodar migrations:
+
+6. Para instalar dependências:
+
+```
+docker compose exec app composer install
+```
+
+7. Para rodar migrations:
 
 ```
 docker compose exec app php artisan migrate
 ```
 
-7. Para instalar dependências (caso necessário):
 
-```
-docker compose exec app composer install
-```
 
 ---
 Qualquer dúvida, consulte o Dockerfile e o docker-compose.yml para detalhes de configuração.
