@@ -27,4 +27,26 @@ class Handler extends ExceptionHandler
             //
         });
     }
+
+    public function render($request, Throwable $exception)
+    {
+        if ($request->expectsJson() || $request->is('api/*')) {
+            $status = 500;
+            $message = 'Server Error';
+
+            if (method_exists($exception, 'getStatusCode')) {
+                $status = $exception->getStatusCode();
+            }
+            if (method_exists($exception, 'getMessage') && $exception->getMessage()) {
+                $message = $exception->getMessage();
+            } elseif ($status === 404) {
+                $message = 'Not Found';
+            }
+
+            return response()->json([
+                'error' => $message,
+            ], $status);
+        }
+        return parent::render($request, $exception);
+    }
 }
