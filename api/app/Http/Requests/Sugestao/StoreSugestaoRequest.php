@@ -17,7 +17,7 @@ class StoreSugestaoRequest extends FormRequest
             'url_youtube' => [
                 'required',
                 'url',
-                'regex:/^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[a-zA-Z0-9_-]{11}$/'
+                'regex:/^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[a-zA-Z0-9_-]{11}([&?].*)?$/'
             ],
         ];
     }
