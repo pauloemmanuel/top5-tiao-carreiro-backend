@@ -23,9 +23,6 @@ class SugestaoController extends Controller
         $this->middleware('auth:sanctum')->except(['store']);
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request): JsonResponse
     {
         $perPage = $request->get('per_page', 15);
@@ -51,9 +48,6 @@ class SugestaoController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreSugestaoRequest $request): JsonResponse
     {
         try {
@@ -66,7 +60,6 @@ class SugestaoController extends Controller
                 ]);
             }
 
-            // Verifica se já existe como música ou sugestão
             if (Musica::where('youtube_id', $videoId)->exists()) {
                 return response()->json([
                     'success' => false,
@@ -82,10 +75,8 @@ class SugestaoController extends Controller
             }
 
             try {
-                // Busca informações do vídeo
                 $videoInfo = $this->youtubeService->getVideoInfo($videoId);
             } catch (\Exception $e) {
-                // Se não conseguir buscar as informações, salva apenas a URL
                 $videoInfo = [
                     'titulo' => null,
                     'visualizacoes' => null,
@@ -94,7 +85,6 @@ class SugestaoController extends Controller
                 ];
             }
 
-            // Cria a sugestão
             $sugestao = Sugestao::create([
                 'url_youtube' => $request->url_youtube,
                 'youtube_id' => $videoId,
@@ -110,7 +100,6 @@ class SugestaoController extends Controller
                 'message' => 'Sugestão enviada com sucesso! Aguarde a aprovação.',
                 'data' => $sugestao
             ], 201);
-
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
@@ -127,9 +116,6 @@ class SugestaoController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Sugestao $sugestao): JsonResponse
     {
         $sugestao->load('aprovadoPor');
@@ -140,9 +126,6 @@ class SugestaoController extends Controller
         ]);
     }
 
-    /**
-     * Aprovar sugestão
-     */
     public function aprovar(ProcessarSugestaoRequest $request, Sugestao $sugestao): JsonResponse
     {
         try {
@@ -155,7 +138,6 @@ class SugestaoController extends Controller
 
             $validated = $request->validated();
 
-            // Se não tiver informações do vídeo, busca agora
             if (!$sugestao->titulo) {
                 try {
                     $videoInfo = $this->youtubeService->getVideoInfo($sugestao->youtube_id);
@@ -169,10 +151,8 @@ class SugestaoController extends Controller
                 }
             }
 
-            // Aprova a sugestão
             $sugestao->aprovar($request->user(), $request->observacoes);
 
-            // Converte para música
             $musica = $sugestao->converterParaMusica();
 
             return response()->json([
@@ -183,7 +163,6 @@ class SugestaoController extends Controller
                     'musica' => $musica
                 ]
             ]);
-
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
@@ -200,9 +179,6 @@ class SugestaoController extends Controller
         }
     }
 
-    /**
-     * Rejeitar sugestão
-     */
     public function rejeitar(ProcessarSugestaoRequest $request, Sugestao $sugestao): JsonResponse
     {
         try {
@@ -215,7 +191,6 @@ class SugestaoController extends Controller
 
             $validated = $request->validated();
 
-            // Rejeita a sugestão
             $sugestao->rejeitar($request->user(), $request->observacoes);
 
             return response()->json([
@@ -223,7 +198,6 @@ class SugestaoController extends Controller
                 'message' => 'Sugestão rejeitada com sucesso',
                 'data' => $sugestao->fresh()
             ]);
-
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
@@ -240,9 +214,6 @@ class SugestaoController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Sugestao $sugestao): JsonResponse
     {
         try {
@@ -252,7 +223,6 @@ class SugestaoController extends Controller
                 'success' => true,
                 'message' => 'Sugestão removida com sucesso'
             ]);
-
         } catch (\Exception $e) {
             Log::error('Erro ao remover sugestão: ' . $e->getMessage());
 

@@ -22,9 +22,6 @@ class MusicaController extends Controller
         $this->middleware('auth:sanctum')->except(['index', 'show', 'top5', 'demais']);
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request): JsonResponse
     {
         $perPage = $request->get('per_page', 15);
@@ -45,9 +42,6 @@ class MusicaController extends Controller
         ]);
     }
 
-    /**
-     * Top 5 músicas mais tocadas
-     */
     public function top5(): JsonResponse
     {
         $musicas = Musica::top5()->get();
@@ -58,9 +52,6 @@ class MusicaController extends Controller
         ]);
     }
 
-    /**
-     * Demais músicas (6ª em diante)
-     */
     public function demais(Request $request): JsonResponse
     {
         $perPage = $request->get('per_page', 10);
@@ -79,9 +70,6 @@ class MusicaController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreMusicaRequest $request): JsonResponse
     {
         try {
@@ -94,7 +82,6 @@ class MusicaController extends Controller
                 ]);
             }
 
-            // Verifica se já existe
             if (Musica::where('youtube_id', $videoId)->exists()) {
                 return response()->json([
                     'success' => false,
@@ -102,10 +89,8 @@ class MusicaController extends Controller
                 ], 409);
             }
 
-            // Busca informações do vídeo
             $videoInfo = $this->youtubeService->getVideoInfo($videoId);
 
-            // Cria a música
             $musica = Musica::create($videoInfo);
 
             return response()->json([
@@ -113,7 +98,6 @@ class MusicaController extends Controller
                 'message' => 'Música adicionada com sucesso',
                 'data' => $musica
             ], 201);
-
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
@@ -130,9 +114,6 @@ class MusicaController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Musica $musica): JsonResponse
     {
         return response()->json([
@@ -141,9 +122,6 @@ class MusicaController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateMusicaRequest $request, Musica $musica): JsonResponse
     {
         try {
@@ -151,7 +129,6 @@ class MusicaController extends Controller
 
             $data = $request->only(['titulo', 'visualizacoes', 'status']);
 
-            // Se foi fornecida nova URL, atualiza youtube_id e thumb
             if ($request->has('url_youtube')) {
                 $videoId = $this->youtubeService::extrairVideoId($request->url_youtube);
                 if (!$videoId) {
@@ -160,7 +137,6 @@ class MusicaController extends Controller
                     ]);
                 }
 
-                // Verifica se outro registro já usa este youtube_id
                 $existing = Musica::where('youtube_id', $videoId)
                     ->where('id', '!=', $musica->id)
                     ->exists();
@@ -183,7 +159,6 @@ class MusicaController extends Controller
                 'message' => 'Música atualizada com sucesso',
                 'data' => $musica->fresh()
             ]);
-
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
@@ -200,9 +175,6 @@ class MusicaController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Musica $musica): JsonResponse
     {
         try {
@@ -212,7 +184,6 @@ class MusicaController extends Controller
                 'success' => true,
                 'message' => 'Música removida com sucesso'
             ]);
-
         } catch (\Exception $e) {
             Log::error('Erro ao remover música: ' . $e->getMessage());
 
