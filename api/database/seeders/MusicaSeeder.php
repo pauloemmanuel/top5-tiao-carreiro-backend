@@ -29,10 +29,10 @@ class MusicaSeeder extends Seeder
                 'status' => 'ativa'
             ],
             [
-                'titulo' => 'Terra roxa',
-                'visualizacoes' => 3300000,
-                'youtube_id' => '4Nb89GFu2g4',
-                'thumb' => 'https://img.youtube.com/vi/4Nb89GFu2g4/hqdefault.jpg',
+                'titulo' => 'Rio de Lágrimas',
+                'visualizacoes' => 153000,
+                'youtube_id' => 'FxXXvPL3JIg',
+                'thumb' => 'https://img.youtube.com/vi/FxXXvPL3JIg/hqdefault.jpg',
                 'status' => 'ativa'
             ],
             [
@@ -43,45 +43,10 @@ class MusicaSeeder extends Seeder
                 'status' => 'ativa'
             ],
             [
-                'titulo' => 'Rio de Lágrimas',
-                'visualizacoes' => 153000,
-                'youtube_id' => 'FxXXvPL3JIg',
-                'thumb' => 'https://img.youtube.com/vi/FxXXvPL3JIg/hqdefault.jpg',
-                'status' => 'ativa'
-            ],
-            [
-                'titulo' => 'Rei do Gado',
-                'visualizacoes' => 2100000,
-                'youtube_id' => 'XeVZPRjGkG4',
-                'thumb' => 'https://img.youtube.com/vi/XeVZPRjGkG4/hqdefault.jpg',
-                'status' => 'ativa'
-            ],
-            [
-                'titulo' => 'Cabocla Teresa',
-                'visualizacoes' => 1800000,
-                'youtube_id' => 'nEBMHcTZQp0',
-                'thumb' => 'https://img.youtube.com/vi/nEBMHcTZQp0/hqdefault.jpg',
-                'status' => 'ativa'
-            ],
-            [
-                'titulo' => 'Índia',
-                'visualizacoes' => 1500000,
-                'youtube_id' => 'dq8YcRi7DD4',
-                'thumb' => 'https://img.youtube.com/vi/dq8YcRi7DD4/hqdefault.jpg',
-                'status' => 'ativa'
-            ],
-            [
-                'titulo' => 'Chico Mineiro',
-                'visualizacoes' => 1200000,
-                'youtube_id' => 'WKGJ7rV3nX8',
-                'thumb' => 'https://img.youtube.com/vi/WKGJ7rV3nX8/hqdefault.jpg',
-                'status' => 'ativa'
-            ],
-            [
-                'titulo' => 'Boi Soberano',
-                'visualizacoes' => 980000,
-                'youtube_id' => 'lNDjJUz-LB4',
-                'thumb' => 'https://img.youtube.com/vi/lNDjJUz-LB4/hqdefault.jpg',
+                'titulo' => 'Terra roxa',
+                'visualizacoes' => 3300000,
+                'youtube_id' => '4Nb89GFu2g4',
+                'thumb' => 'https://img.youtube.com/vi/4Nb89GFu2g4/hqdefault.jpg',
                 'status' => 'ativa'
             ]
         ];
