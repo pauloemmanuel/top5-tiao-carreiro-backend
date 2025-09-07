@@ -21,6 +21,13 @@ Este é o backend da aplicação Top 5 Tião Carreiro & Pardinho, desenvolvido e
 - **Docker & Docker Compose**
 - **PHPUnit** (Testes)
 
+## 👤 Usuário padrão admin
+
+Após rodar os seeders, utilize o seguinte usuário para acessar rotas protegidas como admin:
+
+- **Email:** admin@tiaocarreiro.com
+- **Senha:** password123
+
 ## 🚀 Como executar o projeto
 
 ### Pré-requisitos
