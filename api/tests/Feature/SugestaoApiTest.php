@@ -143,16 +143,13 @@ class SugestaoApiTest extends TestCase
                             'observacoes' => 'Não se encaixa no perfil'
                         ]);
 
-        $this->assertTrue(
-            $response->status() === 200 || $response->status() === 500
-        );
-
-        if ($response->status() === 200) {
-            $this->assertDatabaseHas('sugestoes', [
-                'id' => $sugestao->id,
-                'status' => 'rejeitada'
-            ]);
-        }
+        $response->assertStatus(200)
+                 ->assertJsonPath('success', true)
+                 ->assertJsonMissing(['data']);
+                 
+        $this->assertDatabaseMissing('sugestoes', [
+            'id' => $sugestao->id
+        ]);
     }
 
     public function test_cannot_approve_already_processed_sugestao()

@@ -137,12 +137,11 @@ class SugestaoController extends Controller
         try {
             $validated = $request->validated();
 
-            $sugestao = $this->sugestaoService->rejeitar($sugestao, $request->user(), $request->observacoes);
+            $this->sugestaoService->rejeitar($sugestao, $request->user(), $request->observacoes);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Sugestão rejeitada com sucesso',
-                'data' => $sugestao
+                'message' => 'Sugestão rejeitada com sucesso'
             ]);
         } catch (ValidationException $e) {
             return response()->json([

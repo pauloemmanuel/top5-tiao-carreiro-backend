@@ -16,5 +16,5 @@ interface SugestaoRepositoryInterface
     public function existsByYoutubeId(string $youtubeId, array $ignoreStatus = []): bool;
     public function aprovar(Sugestao $sugestao, \App\Models\User $user, ?string $observacoes = null);
     public function converterParaMusica(Sugestao $sugestao);
-    public function rejeitar(Sugestao $sugestao, \App\Models\User $user, ?string $observacoes = null);
+    public function rejeitar(Sugestao $sugestao, \App\Models\User $user, ?string $observacoes = null): void;
 }

@@ -75,13 +75,13 @@ class EloquentSugestaoRepository implements SugestaoRepositoryInterface
     }
 
 
-    public function rejeitar(Sugestao $sugestao, User $user, ?string $observacoes = null)
+    public function rejeitar(Sugestao $sugestao, User $user, ?string $observacoes = null): void
     {
-        $sugestao->status = 'rejeitada';
-        $sugestao->aprovado_por = $user->id;
-        $sugestao->observacoes = $observacoes;
-        $sugestao->aprovado_em = now();
-        $sugestao->save();
-        $sugestao->delete();
+    $sugestao->status = 'rejeitada';
+    $sugestao->aprovado_por = $user->id;
+    $sugestao->observacoes = $observacoes;
+    $sugestao->aprovado_em = now();
+    $sugestao->save();
+    $sugestao->delete();
     }
 }

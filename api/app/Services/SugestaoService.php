@@ -109,7 +109,7 @@ class SugestaoService
         ];
     }
 
-    public function rejeitar(Sugestao $sugestao, User $user, ?string $observacoes = null): Sugestao
+    public function rejeitar(Sugestao $sugestao, User $user, ?string $observacoes = null): void
     {
         if ($sugestao->status !== 'pendente') {
             throw ValidationException::withMessages([
@@ -118,8 +118,6 @@ class SugestaoService
         }
 
         $this->repo->rejeitar($sugestao, $user, $observacoes);
-
-        return $sugestao->fresh();
     }
 
     public function delete(Sugestao $sugestao): bool
