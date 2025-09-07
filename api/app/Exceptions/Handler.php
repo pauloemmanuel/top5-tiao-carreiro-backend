@@ -31,20 +31,49 @@ class Handler extends ExceptionHandler
     public function render($request, Throwable $exception)
     {
         if ($request->expectsJson() || $request->is('api/*')) {
-            $status = 500;
-            $message = 'Server Error';
+            // Validation errors
+            if ($exception instanceof \Illuminate\Validation\ValidationException) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation error',
+                    'errors' => $exception->errors(),
+                ], 422);
+            }
 
-            if (method_exists($exception, 'getStatusCode')) {
+            // Auth errors
+            if ($exception instanceof \Illuminate\Auth\AuthenticationException) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthenticated',
+                ], 401);
+            }
+
+            // HTTP exceptions (404, 403, etc)
+            if ($exception instanceof \Symfony\Component\HttpKernel\Exception\HttpException) {
+                $status = $exception->getStatusCode();
+                $message = $exception->getMessage() ?: ($status === 404 ? 'Not Found' : 'Error');
+                return response()->json([
+                    'success' => false,
+                    'message' => $message,
+                ], $status);
+            }
+
+            // Conflict (409)
+            if ($exception instanceof \Illuminate\Http\Exceptions\HttpResponseException && $exception->getResponse()->getStatusCode() === 409) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Conflict',
+                ], 409);
+            }
+
+            // Fallback
+            $status = 500;
+            if ($exception instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface) {
                 $status = $exception->getStatusCode();
             }
-            if (method_exists($exception, 'getMessage') && $exception->getMessage()) {
-                $message = $exception->getMessage();
-            } elseif ($status === 404) {
-                $message = 'Not Found';
-            }
-
             return response()->json([
-                'error' => $message,
+                'success' => false,
+                'message' => $exception->getMessage() ?: 'Server Error',
             ], $status);
         }
         return parent::render($request, $exception);

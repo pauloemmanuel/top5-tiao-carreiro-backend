@@ -9,7 +9,7 @@ Este é o backend da aplicação Top 5 Tião Carreiro & Pardinho, desenvolvido e
 - **Autenticação JWT** com Laravel Sanctum
 - **Integração com YouTube** para buscar informações dos vídeos
 - **Paginação** para listas grandes
-- **Testes automatizados** com PHPUnit
+- **Testes Unitários** com PHPUnit
 - **Docker** para padronização do ambiente
 
 ## 🛠️ Tecnologias

@@ -54,11 +54,13 @@ class EloquentSugestaoRepository implements SugestaoRepositoryInterface
         return $query->exists();
     }
 
+
     public function aprovar(Sugestao $sugestao, User $user, ?string $observacoes = null)
     {
         $sugestao->status = 'aprovada';
-        $sugestao->user_id = $user->id;
+        $sugestao->aprovado_por = $user->id;
         $sugestao->observacoes = $observacoes;
+        $sugestao->aprovado_em = now();
         $sugestao->save();
     }
 
@@ -72,11 +74,14 @@ class EloquentSugestaoRepository implements SugestaoRepositoryInterface
         ]);
     }
 
+
     public function rejeitar(Sugestao $sugestao, User $user, ?string $observacoes = null)
     {
         $sugestao->status = 'rejeitada';
-        $sugestao->user_id = $user->id;
+        $sugestao->aprovado_por = $user->id;
         $sugestao->observacoes = $observacoes;
+        $sugestao->aprovado_em = now();
         $sugestao->save();
+        $sugestao->delete();
     }
 }
