@@ -4,8 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Sugestao;
-use App\Models\Musica;
-use App\Services\YouTubeService;
+use App\Services\SugestaoService;
 use App\Http\Requests\Sugestao\StoreSugestaoRequest;
 use App\Http\Requests\Sugestao\ProcessarSugestaoRequest;
 use Illuminate\Http\Request;
@@ -15,37 +14,40 @@ use Illuminate\Support\Facades\Log;
 
 class SugestaoController extends Controller
 {
-    private YouTubeService $youtubeService;
+    private SugestaoService $sugestaoService;
 
-    public function __construct(YouTubeService $youtubeService)
+    public function __construct(SugestaoService $sugestaoService)
     {
-        $this->youtubeService = $youtubeService;
+        $this->sugestaoService = $sugestaoService;
         $this->middleware('auth:sanctum')->except(['store']);
     }
 
     public function index(Request $request): JsonResponse
     {
-        $perPage = $request->get('per_page', 15);
-        $status = $request->get('status');
+        try {
+            $perPage = $request->get('per_page', 15);
+            $status = $request->get('status');
 
-        $query = Sugestao::with('aprovadoPor')->orderBy('created_at', 'desc');
+            $sugestoes = $this->sugestaoService->index($perPage, $status);
 
-        if ($status) {
-            $query->where('status', $status);
+            return response()->json([
+                'success' => true,
+                'data' => $sugestoes->items(),
+                'pagination' => [
+                    'current_page' => $sugestoes->currentPage(),
+                    'per_page' => $sugestoes->perPage(),
+                    'total' => $sugestoes->total(),
+                    'last_page' => $sugestoes->lastPage(),
+                ]
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Erro ao listar sugestões: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro interno do servidor'
+            ], 500);
         }
-
-        $sugestoes = $query->paginate($perPage);
-
-        return response()->json([
-            'success' => true,
-            'data' => $sugestoes->items(),
-            'pagination' => [
-                'current_page' => $sugestoes->currentPage(),
-                'per_page' => $sugestoes->perPage(),
-                'total' => $sugestoes->total(),
-                'last_page' => $sugestoes->lastPage(),
-            ]
-        ]);
     }
 
     public function store(StoreSugestaoRequest $request): JsonResponse
@@ -53,47 +55,7 @@ class SugestaoController extends Controller
         try {
             $validated = $request->validated();
 
-            $videoId = $this->youtubeService::extrairVideoId($request->url_youtube);
-            if (!$videoId) {
-                throw ValidationException::withMessages([
-                    'url_youtube' => 'URL do YouTube inválida'
-                ]);
-            }
-
-            if (Musica::where('youtube_id', $videoId)->exists()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Esta música já está cadastrada'
-                ], 409);
-            }
-
-            if (Sugestao::where('youtube_id', $videoId)->where('status', '!=', 'rejeitada')->exists()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Esta música já foi sugerida'
-                ], 409);
-            }
-
-            try {
-                $videoInfo = $this->youtubeService->getVideoInfo($videoId);
-            } catch (\Exception $e) {
-                $videoInfo = [
-                    'titulo' => null,
-                    'visualizacoes' => null,
-                    'youtube_id' => $videoId,
-                    'thumb' => null
-                ];
-            }
-
-            $sugestao = Sugestao::create([
-                'url_youtube' => $request->url_youtube,
-                'youtube_id' => $videoId,
-                'titulo' => $videoInfo['titulo'],
-                'visualizacoes' => $videoInfo['visualizacoes'],
-                'thumb' => $videoInfo['thumb'],
-                'ip_origem' => $request->ip(),
-                'status' => 'pendente'
-            ]);
+            $sugestao = $this->sugestaoService->store($validated, $request->ip());
 
             return response()->json([
                 'success' => true,
@@ -118,50 +80,41 @@ class SugestaoController extends Controller
 
     public function show(Sugestao $sugestao): JsonResponse
     {
-        $sugestao->load('aprovadoPor');
+        try {
+            $sugestao = $this->sugestaoService->show($sugestao->id);
 
-        return response()->json([
-            'success' => true,
-            'data' => $sugestao
-        ]);
+            if (!$sugestao) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Sugestão não encontrada'
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $sugestao
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Erro ao buscar sugestão: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro interno do servidor'
+            ], 500);
+        }
     }
 
     public function aprovar(ProcessarSugestaoRequest $request, Sugestao $sugestao): JsonResponse
     {
         try {
-            if ($sugestao->status !== 'pendente') {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Esta sugestão já foi processada'
-                ], 409);
-            }
-
             $validated = $request->validated();
 
-            if (!$sugestao->titulo) {
-                try {
-                    $videoInfo = $this->youtubeService->getVideoInfo($sugestao->youtube_id);
-                    $sugestao->update([
-                        'titulo' => $videoInfo['titulo'],
-                        'visualizacoes' => $videoInfo['visualizacoes'],
-                        'thumb' => $videoInfo['thumb']
-                    ]);
-                } catch (\Exception $e) {
-                    Log::warning('Não foi possível atualizar informações do vídeo: ' . $e->getMessage());
-                }
-            }
-
-            $sugestao->aprovar($request->user(), $request->observacoes);
-
-            $musica = $sugestao->converterParaMusica();
+            $result = $this->sugestaoService->aprovar($sugestao, $request->user(), $request->observacoes);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Sugestão aprovada e música adicionada com sucesso',
-                'data' => [
-                    'sugestao' => $sugestao->fresh(),
-                    'musica' => $musica
-                ]
+                'data' => $result
             ]);
         } catch (ValidationException $e) {
             return response()->json([
@@ -182,21 +135,14 @@ class SugestaoController extends Controller
     public function rejeitar(ProcessarSugestaoRequest $request, Sugestao $sugestao): JsonResponse
     {
         try {
-            if ($sugestao->status !== 'pendente') {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Esta sugestão já foi processada'
-                ], 409);
-            }
-
             $validated = $request->validated();
 
-            $sugestao->rejeitar($request->user(), $request->observacoes);
+            $sugestao = $this->sugestaoService->rejeitar($sugestao, $request->user(), $request->observacoes);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Sugestão rejeitada com sucesso',
-                'data' => $sugestao->fresh()
+                'data' => $sugestao
             ]);
         } catch (ValidationException $e) {
             return response()->json([
@@ -217,7 +163,7 @@ class SugestaoController extends Controller
     public function destroy(Sugestao $sugestao): JsonResponse
     {
         try {
-            $sugestao->delete();
+            $this->sugestaoService->delete($sugestao);
 
             return response()->json([
                 'success' => true,

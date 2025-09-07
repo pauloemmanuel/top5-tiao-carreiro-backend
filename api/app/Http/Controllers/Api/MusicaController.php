@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Musica;
 use App\Services\YouTubeService;
+use App\Services\MusicaService;
 use App\Http\Requests\Musica\StoreMusicaRequest;
 use App\Http\Requests\Musica\UpdateMusicaRequest;
 use Illuminate\Http\Request;
@@ -15,10 +16,12 @@ use Illuminate\Support\Facades\Log;
 class MusicaController extends Controller
 {
     private YouTubeService $youtubeService;
+    private MusicaService $musicaService;
 
-    public function __construct(YouTubeService $youtubeService)
+    public function __construct(YouTubeService $youtubeService, MusicaService $musicaService)
     {
         $this->youtubeService = $youtubeService;
+        $this->musicaService = $musicaService;
         $this->middleware('auth:sanctum')->except(['index', 'show', 'top5', 'demais']);
     }
 
@@ -26,9 +29,7 @@ class MusicaController extends Controller
     {
         $perPage = $request->get('per_page', 15);
 
-        $musicas = Musica::ativas()
-            ->ordenadaPorVisualizacoes()
-            ->paginate($perPage);
+        $musicas = $this->musicaService->index($perPage);
 
         return response()->json([
             'success' => true,
@@ -44,7 +45,7 @@ class MusicaController extends Controller
 
     public function top5(): JsonResponse
     {
-        $musicas = Musica::top5()->get();
+        $musicas = $this->musicaService->top5();
 
         return response()->json([
             'success' => true,
@@ -56,7 +57,7 @@ class MusicaController extends Controller
     {
         $perPage = $request->get('per_page', 10);
 
-        $musicas = Musica::demais()->paginate($perPage);
+        $musicas = $this->musicaService->demais($perPage);
 
         return response()->json([
             'success' => true,
@@ -91,7 +92,7 @@ class MusicaController extends Controller
 
             $videoInfo = $this->youtubeService->getVideoInfo($videoId);
 
-            $musica = Musica::create($videoInfo);
+            $musica = $this->musicaService->store($videoInfo);
 
             return response()->json([
                 'success' => true,
@@ -152,12 +153,12 @@ class MusicaController extends Controller
                 $data['thumb'] = "https://img.youtube.com/vi/{$videoId}/hqdefault.jpg";
             }
 
-            $musica->update($data);
+            $updated = $this->musicaService->update($musica, $data);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Música atualizada com sucesso',
-                'data' => $musica->fresh()
+                'data' => $updated
             ]);
         } catch (ValidationException $e) {
             return response()->json([
@@ -178,7 +179,7 @@ class MusicaController extends Controller
     public function destroy(Musica $musica): JsonResponse
     {
         try {
-            $musica->delete();
+            $this->musicaService->delete($musica);
 
             return response()->json([
                 'success' => true,
