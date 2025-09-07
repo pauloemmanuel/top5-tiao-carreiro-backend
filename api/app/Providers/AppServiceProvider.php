@@ -2,10 +2,12 @@
 
 namespace App\Providers;
 
+use App\Repositories\Interface\MusicaRepositoryInterface;
+use App\Repositories\Interface\SugestaoRepositoryInterface;
 use Illuminate\Support\ServiceProvider;
-use App\Repositories\MusicaRepositoryInterface;
+
 use App\Repositories\EloquentMusicaRepository;
-use App\Repositories\SugestaoRepositoryInterface;
+
 use App\Repositories\EloquentSugestaoRepository;
 
 class AppServiceProvider extends ServiceProvider
