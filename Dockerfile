@@ -1,5 +1,5 @@
 # Dockerfile para Laravel API (PHP-FPM)
-FROM php:8.1-fpm
+FROM php:8.2-fpm
 
 # Instala dependências do sistema
 RUN apt-get update && apt-get install -y \

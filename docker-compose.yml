@@ -11,6 +11,7 @@ services:
     working_dir: /var/www
     volumes:
       - ./api:/var/www
+      - vendor:/var/www/vendor
     expose:
       - "9000"
     networks:
@@ -56,3 +57,4 @@ networks:
 
 volumes:
   dbdata:
+  vendor:

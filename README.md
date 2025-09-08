@@ -32,20 +32,25 @@ Após rodar os seeders, utilize o seguinte usuário para acessar rotas protegida
 
 ### Pré-requisitos
 
-- Docker Desktop instalado e rodando
+- Docker 
 - Git
 
 ### Setup do projeto
 
-1. Clone o repositório:
-```bash
-git clone https://github.com/pauloemmanuel/top5-tiao-carreiro-backend.git
-cd top5-tiao-carreiro-backend
-```
 
-2. Inicie os containers:
+
+1. Inicie os containers (Já deve baixar as dependências do composer):
 ```bash
 docker-compose up -d --build
+```
+
+2. Copie o arquivo de exemplo de variáveis de ambiente:
+```bash
+# Dentro do container (recomendado)
+docker-compose exec app cp .env.example .env
+
+# Ou, no host (PowerShell):
+copy .env.example .env
 ```
 
 3. Gere a chave da aplicação Laravel:
@@ -59,7 +64,7 @@ docker-compose exec app php artisan migrate:fresh --seed
 ```
 
 
-5. Teste a api em:
+4. Teste a api em:
    - **API**: http://localhost/api/ping
 
 
@@ -71,31 +76,10 @@ Execute os testes automatizados:
 docker-compose exec app php artisan test
 ```
 
-### Testando a API com Postman/Insomnia
-
-Importe o arquivo `postman_collection.json` no Postman ou Insomnia para testar todos os endpoints da API.
-
-**Variáveis da coleção:**
-- `base_url`: http://localhost/api
-- `auth_token`: Token JWT retornado no login
-
-**Fluxo recomendado:**
-1. Fazer login para obter o token
-2. Configurar a variável `auth_token` 
-3. Testar endpoints protegidos
-
-## 📊 Banco de Dados
-
-### Usuários padrão criados pelos seeders:
+## Usuários padrão criados pelos seeders:
 
 - **Admin**: admin@tiaocarreiro.com / password123
 - **Teste**: teste@tiaocarreiro.com / teste123
-
-### Estrutura das tabelas:
-
-- `users` - Usuários do sistema
-- `musicas` - Músicas cadastradas
-- `sugestoes` - Sugestões enviadas pelos usuários
 
 ## 🔧 Comandos úteis
 
@@ -106,6 +90,8 @@ docker-compose exec app bash
 # Ver logs
 docker-compose logs -f app
 
+# Baixar as dependencias: 
+docker-compose exec app composer install
 # Parar containers
 docker-compose down
 
