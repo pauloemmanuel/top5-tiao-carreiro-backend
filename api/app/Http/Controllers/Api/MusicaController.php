@@ -31,14 +31,29 @@ class MusicaController extends Controller
 
         $musicas = $this->musicaService->index($perPage);
 
+        $baseUrl = url('/api/musicas');
+        $currentPage = $musicas->currentPage();
+
         return response()->json([
             'success' => true,
             'data' => $musicas->items(),
             'pagination' => [
-                'current_page' => $musicas->currentPage(),
+                'current_page' => $currentPage,
                 'per_page' => $musicas->perPage(),
                 'total' => $musicas->total(),
                 'last_page' => $musicas->lastPage(),
+                'count' => count($musicas->items()),
+                'total_pages' => $musicas->lastPage(),
+                'first' => $baseUrl . '?page=1',
+                'last' => $baseUrl . '?page=' . $musicas->lastPage(),
+                'next' => $musicas->hasMorePages() ? $baseUrl . '?page=' . ($currentPage + 1) : null,
+                'previous' => $currentPage > 1 ? $baseUrl . '?page=' . ($currentPage - 1) : null,
+                'links' => [
+                    ['rel' => 'first', 'href' => $baseUrl . '?page=1'],
+                    ['rel' => 'last', 'href' => $baseUrl . '?page=' . $musicas->lastPage()],
+                    ['rel' => 'next', 'href' => $musicas->hasMorePages() ? $baseUrl . '?page=' . ($currentPage + 1) : null],
+                    ['rel' => 'prev', 'href' => $currentPage > 1 ? $baseUrl . '?page=' . ($currentPage - 1) : null]
+                ]
             ]
         ]);
     }
@@ -59,14 +74,31 @@ class MusicaController extends Controller
 
         $musicas = $this->musicaService->demais($perPage);
 
+        $baseUrl = url('/api/musicas/demais');
+        $currentPage = $musicas->currentPage();
+
         return response()->json([
             'success' => true,
             'data' => $musicas->items(),
             'pagination' => [
-                'current_page' => $musicas->currentPage(),
+                // Mantém campos existentes para compatibilidade
+                'current_page' => $currentPage,
                 'per_page' => $musicas->perPage(),
                 'total' => $musicas->total(),
                 'last_page' => $musicas->lastPage(),
+                // Adiciona campos REST padrão
+                'count' => count($musicas->items()),
+                'total_pages' => $musicas->lastPage(),
+                'first' => $baseUrl . '?page=1',
+                'last' => $baseUrl . '?page=' . $musicas->lastPage(),
+                'next' => $musicas->hasMorePages() ? $baseUrl . '?page=' . ($currentPage + 1) : null,
+                'previous' => $currentPage > 1 ? $baseUrl . '?page=' . ($currentPage - 1) : null,
+                'links' => [
+                    ['rel' => 'first', 'href' => $baseUrl . '?page=1'],
+                    ['rel' => 'last', 'href' => $baseUrl . '?page=' . $musicas->lastPage()],
+                    ['rel' => 'next', 'href' => $musicas->hasMorePages() ? $baseUrl . '?page=' . ($currentPage + 1) : null],
+                    ['rel' => 'prev', 'href' => $currentPage > 1 ? $baseUrl . '?page=' . ($currentPage - 1) : null]
+                ]
             ]
         ]);
     }
