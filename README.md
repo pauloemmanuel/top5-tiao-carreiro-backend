@@ -44,7 +44,12 @@ Após rodar os seeders, utilize o seguinte usuário para acessar rotas protegida
 docker-compose up -d --build
 ```
 
-2. Copie o arquivo de exemplo de variáveis de ambiente:
+2. Baixe as dependências
+```bash
+docker-compose exec app composer install
+```
+
+3. Copie o arquivo de exemplo de variáveis de ambiente:
 ```bash
 # Dentro do container (recomendado)
 docker-compose exec app cp .env.example .env
@@ -53,18 +58,17 @@ docker-compose exec app cp .env.example .env
 copy .env.example .env
 ```
 
-3. Gere a chave da aplicação Laravel:
+4. Gere a chave da aplicação Laravel:
 ```bash
 docker-compose exec app php artisan key:generate
 ```
 
-4. Aguarde o MySQL inicializar (aproximadamente 30 segundos) e execute as migrations:
+5. Execute as migrations:
 ```bash
 docker-compose exec app php artisan migrate:fresh --seed
 ```
 
-
-4. Teste a api em:
+6. Teste a api em:
    - **API**: http://localhost/api/ping
 
 

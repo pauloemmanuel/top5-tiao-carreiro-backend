@@ -20,7 +20,16 @@ class EloquentMusicaRepository implements MusicaRepositoryInterface
 
     public function paginateDemais(int $perPage = 10): LengthAwarePaginator
     {
-        return Musica::demais()->paginate($perPage);
+        $topIds = Musica::ativas()
+            ->ordenadaPorVisualizacoes()
+            ->limit(5)
+            ->pluck('id')
+            ->toArray();
+
+        return Musica::ativas()
+            ->ordenadaPorVisualizacoes()
+            ->whereNotIn('id', $topIds)
+            ->paginate($perPage);
     }
 
     public function create(array $data): Musica
